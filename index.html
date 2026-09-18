@@ -363,12 +363,26 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
 }
 
 
-/* v1.13.6 — relatórios, voz e último fim */
+/* v1.13.7 — relatórios, voz e último fim */
 .lastShiftEndMini{float:left;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:7px;align-items:center;margin:8px 10px 8px 0;padding:7px 9px;border:1px solid #2b383e;border-radius:11px;background:#0b1114;min-width:128px}
 .lastShiftEndMini span{grid-column:1/-1;font-size:8px;font-weight:950;color:#8e9c95;letter-spacing:.08em}.lastShiftEndMini b{font-size:15px;font-variant-numeric:tabular-nums;color:#fff}.lastShiftEndMini small{font-size:9px;color:#9eaaa4}
 .reportActionStatus{margin-top:8px;padding:8px 10px;border:1px solid #2c3a40;border-radius:10px;background:#0b1215;color:#aebbb5;font-size:10px;line-height:1.4}.reportActionStatus.ok{border-color:#34734f;color:#c7ffdc;background:#0e1d14}.reportActionStatus.warn{border-color:#a8772b;color:#ffe0a5;background:#211809}.reportActionStatus.err{border-color:#a6404b;color:#ffc4ca;background:#241014}
 .voiceFallbackGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.voiceFallbackGrid button{min-height:42px}
 @media(max-width:390px){.voiceFallbackGrid{grid-template-columns:1fr}.lastShiftEndMini{float:none;margin:8px 0}}
+
+
+/* v1.13.7 — voz multilíngue, alertas de trabalho e relatório técnico */
+.headerActions{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.headerEditBtn{min-height:34px!important;width:auto!important;padding:6px 8px!important;border-radius:10px!important;background:#102219!important;border:1px solid #2f6a48!important;color:#dffff0!important;font-size:8px!important;display:flex!important;flex-direction:row!important;gap:5px!important}
+.headerEditBtn .profileQuickIcon{font-size:13px!important}
+.clockProfileGrid.v137{display:block!important}.clockProfileGrid.v137 .clockCenter{text-align:center}
+.workComplianceCard{margin-top:10px;padding:11px;border:1px solid #355945;border-radius:13px;background:#0e1914}
+.workComplianceCard.warn{border-color:#b27b2b;background:#261b0b}.workComplianceCard.bad{border-color:#b84b58;background:#2b1115}
+.workComplianceGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.workComplianceItem{padding:8px;border:1px solid #2a3b32;border-radius:10px;background:#0b1410}
+.workComplianceItem b,.workComplianceItem span{display:block}.workComplianceItem b{font-size:11px;color:#fff}.workComplianceItem span{font-size:9px;color:#bcd4c5;line-height:1.35;margin-top:3px}
+.techObsList{display:grid;gap:6px;margin:9px 0}.techObsRow{padding:8px;border:1px solid #38464d;border-radius:10px;background:#0c1215}.techObsRow b,.techObsRow span{display:block}.techObsRow b{font-size:10px;color:#fff}.techObsRow span{font-size:9px;color:#aebbb5;line-height:1.4;margin-top:3px}
+.sessionActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sessionOverlay{position:fixed;inset:0;z-index:1200;background:#050708;display:none;place-items:center;padding:20px}.sessionOverlay.show{display:grid}.sessionClosedCard{max-width:420px;width:100%;text-align:center;padding:26px;border:1px solid #2b3a41;border-radius:22px;background:#0d1417;box-shadow:0 18px 55px rgba(0,0,0,.45)}.sessionClosedCard h2{font-size:24px}.sessionClosedCard p{font-size:12px}
+@media(max-width:520px){.workComplianceGrid{grid-template-columns:1fr}.headerActions{max-width:58%}.headerEditBtn{font-size:7.4px!important}}
 
 </style>
 <link rel="manifest" href="./manifest.webmanifest">
@@ -380,22 +394,22 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
     <img class="brandIcon" src="data:image/png;base64,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" alt="">
     <div><div class="brand">Tacho<span>Control</span></div></div>
   </div>
-  <div class="badges technicalBadges"><span id="network" class="badge">—</span></div>
+  <div class="headerActions">
+    <button id="profileQuickBtn" class="profileQuickBtn headerEditBtn" type="button" aria-label="Editar dados do condutor e matrícula">
+      <span class="profileQuickIcon" aria-hidden="true">✎</span><span id="profileQuickText">INSERIR DADOS</span>
+    </button>
+    <span id="network" class="badge">—</span>
+  </div>
 </header>
 
 <section id="screen-now" class="screen active">
   <div class="clockWrap">
-    <div class="clockProfileGrid">
-      <button id="profileQuickBtn" class="profileQuickBtn" type="button" aria-label="Dados do condutor e matrícula">
-        <span class="profileQuickIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="17" height="17"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4.5 21c.5-5 3-7.5 7.5-7.5S19 16 19.5 21H4.5z" fill="currentColor"/></svg></span>
-        <span id="profileQuickText">INSERIR DADOS</span>
-      </button>
+    <div class="clockProfileGrid v137">
       <div class="clockCenter">
         <div id="clock" class="clock">--:--:--</div>
         <div id="date" class="date">—</div>
         <div id="profileLine" class="profileLine">Condutor: —</div>
       </div>
-      <span class="clockBalanceSpacer" aria-hidden="true"></span>
     </div>
   </div>
 
@@ -498,13 +512,21 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
 
       <div id="splitInfo" class="splitInfo">Pausa dividida: ainda não existe uma 1ª parte de 15+ min concluída.</div>
       <div id="dailyReductionStatus" class="dailyReductionStatus compactReduction"><span>Repouso diário reduzido</span><b>0/3</b></div>
+      <div id="workComplianceCard" class="workComplianceCard">
+        <div class="workComplianceGrid">
+          <div class="workComplianceItem"><b>PAUSA DE TRABALHO</b><span id="workBreakStatus">A calcular…</span></div>
+          <div class="workComplianceItem"><b>TRABALHO SEMANAL</b><span id="weeklyWorkStatus">A calcular…</span></div>
+          <div class="workComplianceItem"><b>MÉDIA 4 MESES</b><span id="fourMonthWorkStatus">A calcular…</span></div>
+        </div>
+        <p class="small" style="margin:8px 0 0">Indicador local BETA. Tempo de disponibilidade não entra no tempo de trabalho. O período legal de referência pode depender de regulamentação coletiva.</p>
+      </div>
     </div>
   </div>
 
   <div id="restPanel" class="card restCard hidden">
     <span class="sourceTag">DESCANSO EM CURSO • CLASSIFICAÇÃO AUTOMÁTICA</span>
     <div class="lastShiftEndMini" aria-label="Último fim de jornada">
-      <span>ÚLTIMO FIM</span><b id="lastShiftEndTime">--:--:--</b><small id="lastShiftEndDate">--/--/----</small>
+      <span>ÚLTIMO FIM DE TURNO</span><b id="lastShiftEndTime">--:--:--</b><small id="lastShiftEndDate">--/--/----</small>
     </div>
     <div id="restKind" class="restKind" style="margin-top:10px">—</div>
     <div class="restTimerLabel">TEMPO REAL DE DESCANSO</div>
@@ -730,6 +752,11 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
       <div class="sectionTitle" style="margin-top:16px"><h2>Alertas</h2></div>
       <div class="switchRow"><span>Som do alerta</span><input id="soundToggle" type="checkbox"></div>
       <div class="switchRow"><span>Vibração</span><input id="vibrationToggle" type="checkbox"></div>
+      <div class="switchRow"><span>Avisos falados</span><input id="voiceAlertsToggle" type="checkbox"></div>
+      <div class="switchRow"><span>Pré-alertas de condução 4h30</span><input id="driveAlertsToggle" type="checkbox"></div>
+      <div class="switchRow"><span>Pausa de trabalho antes de 6h</span><input id="workBreakAlertsToggle" type="checkbox"></div>
+      <div class="switchRow"><span>Trabalho semanal até 60h</span><input id="weeklyWorkAlertsToggle" type="checkbox"></div>
+      <div class="switchRow"><span>Média de 48h / 4 meses</span><input id="fourMonthAlertsToggle" type="checkbox"></div>
       <div id="backgroundStatus" class="backgroundStatus">Relógio por timestamps ativo</div>
       <div class="switchRow"><span>Manter a tela acordada</span><input id="keepScreenAwake" type="checkbox"></div>
 
@@ -755,6 +782,24 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
 
 
   <div class="card">
+    <details id="technicalReportAccess" class="expand moreDetails">
+      <summary>Relatório técnico de avisos</summary>
+      <p class="small">Separado do relatório principal. Regista apenas avisos especiais e confirmações, por exemplo quando uma nova jornada é iniciada antes da meta de repouso indicada pela aplicação.</p>
+      <div id="technicalObservationList" class="techObsList"></div>
+      <button id="technicalPdfBtn" style="width:100%">GUARDAR PDF TÉCNICO</button>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle"><h2>Sessão / segundo plano</h2><span class="mini">não apaga dados</span></div>
+    <div class="sessionActions">
+      <button id="backgroundQuickBtn">MINIMIZAR / 2º PLANO</button>
+      <button id="sessionExitBtn" class="badBtn">SAIR DO APP</button>
+    </div>
+    <p class="small" style="margin:8px 0 0">A PWA não pode obrigar o telemóvel a minimizar. O botão prepara a aplicação e indica para usar o gesto Home. “Sair” mostra uma tela neutra e preserva os registos.</p>
+  </div>
+
+  <div class="card">
     <details class="expand moreDetails">
       <summary>Comandos de voz</summary>
       <p class="small">Ativa uma vez por sessão. Enquanto a app estiver visível, ela tenta continuar a ouvir. O navegador pode suspender o microfone em segundo plano.</p>
@@ -775,7 +820,7 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
         </div>
         <p class="small">Serve para testar a lógica quando o visualizador local bloquear o microfone. No PWA/HTTPS, usa a voz normalmente.</p>
       </details>
-      <p class="small">Fala naturalmente: “comecei a jornada”, “agora vou dirigir”, “coloca pausa”, “estou em ferry”, “ferry em descanso”, “muda para disponibilidade”, “terminei a jornada”, “abre o relatório”, “guarda o PDF”, “mostra o histórico”, “quanto falta para a pausa”. Não precisas decorar uma frase exata.</p>
+      <p class="small">Fala naturalmente em português, inglês, espanhol, francês, alemão ou italiano. Exemplos: “iniciar jornada”, “finalizar turno”, “iniciar condução”, “start driving”, “empezar a conducir”, “commencer à conduire”, “Fahrt starten”, “iniziare guida”, “abre o relatório”, “sair do aplicativo”.</p>
     </details>
   </div>
 
@@ -897,6 +942,14 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
 </div>
 
 
+<div id="sessionClosedOverlay" class="sessionOverlay">
+  <div class="sessionClosedCard">
+    <h2>TachoControl</h2>
+    <p>Sessão encerrada neste ecrã. Os registos locais foram preservados.</p>
+    <button id="sessionReopenBtn" class="primary" style="width:100%">ABRIR NOVAMENTE</button>
+  </div>
+</div>
+
 <div id="updateBanner" class="updateBanner hidden">
   <div><b>Nova versão disponível</b><span>Os dados locais são preservados. Atualiza quando for conveniente.</span></div>
   <button id="updateNowBtn">ATUALIZAR</button>
@@ -926,7 +979,10 @@ const RULES = {
   weeklyRestReduced: 24 * 3600,
   amplitudeRegularReference: 13 * 3600, // 24h - 11h regular rest, simple end-of-shift reference
   amplitudeReducedReference: 15 * 3600, // 24h - 9h reduced rest
-  nightWorkMax: 10 * 3600              // Portugal DL 84/2026 art. 22; availability excluded
+  nightWorkMax: 10 * 3600,             // Portugal DL 84/2026 art. 22; availability excluded
+  workBreakMax: 6 * 3600,
+  weeklyWorkMax: 60 * 3600,
+  fourMonthAverageMax: 48 * 3600
 };
 
 const STORAGE = {
@@ -971,7 +1027,8 @@ function emptyJournal() {
     operationalResets: [],
     countryChanges: [],
     currentCountry: null,
-    metricResetAt: null
+    metricResetAt: null,
+    technicalObservations: []
   };
 }
 
@@ -987,12 +1044,18 @@ journal.operationalResets = journal.operationalResets || [];
 journal.countryChanges = journal.countryChanges || [];
 journal.currentCountry = journal.currentCountry || null;
 journal.metricResetAt = journal.metricResetAt || null;
+journal.technicalObservations = journal.technicalObservations || [];
 let profile = safeLoad(STORAGE.profile, { name: "", plate: "" });
 let settings = safeLoad(STORAGE.settings, { sound: true, vibration: true });
 let monthlyArchives = safeLoad(STORAGE.monthlyArchives, {});
 settings.voiceHandsFree = settings.voiceHandsFree ?? false;
 settings.spokenConfirmations = settings.spokenConfirmations ?? true;
 settings.keepScreenAwake = settings.keepScreenAwake ?? false;
+settings.voiceAlerts = settings.voiceAlerts ?? true;
+settings.driveAlerts = settings.driveAlerts ?? true;
+settings.workBreakAlerts = settings.workBreakAlerts ?? true;
+settings.weeklyWorkAlerts = settings.weeklyWorkAlerts ?? true;
+settings.fourMonthAlerts = settings.fourMonthAlerts ?? true;
 
 let tick = null;
 let audioCtx = null;
@@ -1002,6 +1065,7 @@ let voiceRecognition = null;let voiceListening = false;
 let voiceManualStop = false;
 let wakeLock = null;
 let lastBackgroundAt = null;
+let voicePendingAction = null;
 
 function toIso(value) {
   const d = value instanceof Date ? value : new Date(value);
@@ -1226,6 +1290,100 @@ function computeMetrics(now = new Date()) {
     weeklyLeft: Math.max(0, RULES.weeklyMax - weekDriving),
     fortnightLeft: Math.max(0, RULES.fortnightMax - (weekDriving + prevWeekDriving))
   };
+}
+
+
+function workType(type) {
+  return type === "driving" || type === "other_work" || type === "ferry_work";
+}
+function workTimeState(now = new Date()) {
+  const events = effectiveEvents(now);
+  const weekStart = mondayStart(now);
+  const nextWeek = new Date(weekStart); nextWeek.setDate(nextWeek.getDate()+7);
+  let weeklyWork = 0;
+  for (const e of events) if (workType(e.type)) weeklyWork += overlapSeconds(e, weekStart, nextWeek);
+
+  const shiftStart = journal.shiftStart && !journal.shiftEnd ? new Date(journal.shiftStart) : null;
+  let workSinceBreak = 0;
+  if (shiftStart) {
+    const shiftEvents = events.filter(e => new Date(e.end) > shiftStart).sort((a,b)=>new Date(a.start)-new Date(b.start));
+    for (const e of shiftEvents) {
+      const sec = secBetween(e.start, e.end);
+      if (workType(e.type)) workSinceBreak += sec;
+      else if ((e.type === "break" || e.type === "rest" || e.type === "ferry_rest") && sec >= 15*60) workSinceBreak = 0;
+    }
+  }
+
+  const windowEnd = new Date(now);
+  const windowStart = new Date(now);
+  windowStart.setMonth(windowStart.getMonth()-4);
+  let fourMonthWork = 0;
+  const workEvents = events.filter(e => workType(e.type));
+  for (const e of workEvents) fourMonthWork += overlapSeconds(e, windowStart, windowEnd);
+  const windowWeeks = Math.max(1, (windowEnd-windowStart)/(7*24*3600*1000));
+  const fourMonthAverage = fourMonthWork / windowWeeks;
+  const firstKnown = workEvents.length ? new Date(workEvents[0].start) : null;
+  const completeFourMonthData = !!(firstKnown && firstKnown <= new Date(windowStart.getTime()+24*3600*1000));
+
+  return {
+    weeklyWork,
+    weeklyWorkLeft: Math.max(0, RULES.weeklyWorkMax-weeklyWork),
+    workSinceBreak,
+    workBreakLeft: Math.max(0, RULES.workBreakMax-workSinceBreak),
+    fourMonthWork,
+    fourMonthAverage,
+    fourMonthAverageLeft: Math.max(0, RULES.fourMonthAverageMax-fourMonthAverage),
+    fourMonthStart: windowStart,
+    completeFourMonthData
+  };
+}
+
+function addTechnicalObservation(type, message, meta = {}) {
+  journal.technicalObservations = journal.technicalObservations || [];
+  journal.technicalObservations.push({
+    id:newId(), at:new Date().toISOString(), type, message:String(message || ""), ...meta
+  });
+  persist();
+  renderTechnicalObservations();
+}
+function renderTechnicalObservations() {
+  const box = $("technicalObservationList");
+  if (!box) return;
+  const rows = (journal.technicalObservations || []).slice().reverse();
+  box.innerHTML = rows.length ? rows.slice(0,80).map(r => `
+    <div class="techObsRow"><b>${esc(new Date(r.at).toLocaleString("pt-PT"))} • ${esc(r.type || "aviso")}</b>
+    <span>${esc(r.message || "")}</span></div>`).join("") :
+    '<p class="muted">Sem observações técnicas.</p>';
+}
+function technicalReportLines() {
+  const rows = (journal.technicalObservations || []).slice();
+  return [
+    "TachoControl - Relatório Técnico de Avisos",
+    `Condutor: ${profile.name || "Não informado"}`,
+    `Matrícula: ${profile.plate || "Não informada"}`,
+    `Gerado em: ${new Date().toLocaleString("pt-PT")}`,
+    "",
+    "Este relatório é separado do relatório principal e não altera os registos de atividade.",
+    "",
+    ...(rows.length ? rows.map(r => `${new Date(r.at).toLocaleString("pt-PT")} | ${r.type || "aviso"} | ${r.message || ""}`) : ["Sem observações técnicas."])
+  ];
+}
+function earlyStartWarningState(when = new Date()) {
+  const rest = dailyRestProgress(when);
+  if (!rest || rest.complete) return null;
+  return {
+    rest,
+    message:`O repouso registado ainda não atingiu a meta indicada pela aplicação. Foram registadas ${hm(rest.elapsed)} e faltam ${hm(rest.left)}. Prosseguir pode criar uma situação de não conformidade e consequências previstas nas regras aplicáveis. A decisão de prosseguir é do condutor/operador. O TachoControl é apenas informativo e não substitui o tacógrafo nem avaliação jurídica.`
+  };
+}
+function logEarlyStartWarning(state, source = "screen") {
+  if (!state) return;
+  addTechnicalObservation("INÍCIO ANTES DA META DE REPOUSO", state.message, {
+    source, restSeconds:state.rest.elapsed, missingSeconds:state.rest.left, confirmed:true
+  });
+}
+function defaultJourneyCountry() {
+  return journal.currentCountry || {code:"P",name:"Portugal",region:""};
 }
 
 function switchActivity(type, when = new Date()) {
@@ -1888,6 +2046,19 @@ function sendBrowserNotification(title, body) {
   try { new Notification(title, { body, icon: "./icons/icon-192.png" }); } catch {}
 }
 
+function voiceLocale() {
+  const lang = typeof resolvedLanguage === "function" ? resolvedLanguage() : String(navigator.language || "pt").slice(0,2).toLowerCase();
+  return ({pt:"pt-PT",en:"en-US",es:"es-ES",fr:"fr-FR",de:"de-DE",it:"it-IT"})[lang] || "pt-PT";
+}
+function speakAlert(text) {
+  if (!settings.voiceAlerts || !("speechSynthesis" in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text || ""));
+    u.lang = voiceLocale(); u.rate = 1; u.pitch = 1;
+    speechSynthesis.speak(u);
+  } catch {}
+}
 function showAlarm(key, level, title, text, sticky = false) {
   if (alarmKeys.has(key)) return;
   alarmKeys.add(key);
@@ -1899,41 +2070,155 @@ function showAlarm(key, level, title, text, sticky = false) {
   beep(level === "critical" ? "critical" : "pre");
   vibrate(level === "critical" ? "critical" : "pre");
   sendBrowserNotification(title, text);
+  speakAlert(`${title}. ${text}`);
 }
 function hideAlarm() {
   $("alarmOverlay").classList.remove("show", "critical", "warning");
 }
 $("alarmDismiss").addEventListener("click", hideAlarm);
 
+
+function alertCopy(key, data = {}) {
+  const lang = typeof resolvedLanguage === "function" ? resolvedLanguage() : "pt";
+  const n = data.value || "";
+  const table = {
+    pt:{
+      drive30:["Pausa de condução em 30 minutos","Faltam cerca de 30 minutos para a referência de 4 horas e 30 de condução."],
+      drive15:["Pausa de condução em 15 minutos","Faltam cerca de 15 minutos para a referência de 4 horas e 30. Planeia uma pausa de 45 minutos ou, quando aplicável, 15 mais 30."],
+      drive5:["Pausa de condução em 5 minutos","Faltam cerca de 5 minutos para a referência de 4 horas e 30."],
+      drive0:["Pausa de condução indicada agora","A referência de 4 horas e 30 foi atingida. Regista a pausa aplicável."],
+      work30:["Pausa de trabalho em 30 minutos","Faltam cerca de 30 minutos para seis horas de trabalho sem pausa válida."],
+      work15:["Pausa de trabalho em 15 minutos","Faltam cerca de 15 minutos para seis horas de trabalho sem pausa válida."],
+      work5:["Pausa de trabalho em 5 minutos","Faltam cerca de 5 minutos para seis horas de trabalho sem pausa válida."],
+      work0:["Pausa de trabalho indicada agora","O acompanhamento local atingiu seis horas de trabalho sem pausa válida de pelo menos 15 minutos."],
+      weekly:["Trabalho semanal a aproximar-se do limite",`Faltam aproximadamente ${n} para 60 horas de trabalho nesta semana.`],
+      weekly0:["Referência semanal de trabalho atingida","O acompanhamento local chegou a 60 horas de trabalho nesta semana."],
+      avg:["Média de trabalho de quatro meses",`A média móvel local está em aproximadamente ${n} por semana, próxima da referência de 48 horas.`],
+      avg0:["Referência média de 48 horas atingida","A média móvel local de quatro meses chegou a aproximadamente 48 horas semanais. Confirma o período de referência aplicável na empresa."]
+    },
+    en:{
+      drive30:["Driving break in 30 minutes","About 30 minutes remain before the 4 hour 30 minute driving reference."],
+      drive15:["Driving break in 15 minutes","About 15 minutes remain before 4 hours 30 minutes. Plan a 45-minute break or, where applicable, 15 plus 30."],
+      drive5:["Driving break in 5 minutes","About 5 minutes remain before 4 hours 30 minutes."],
+      drive0:["Driving break indicated now","The 4 hour 30 minute reference has been reached. Record the applicable break."],
+      work30:["Work break in 30 minutes","About 30 minutes remain before six hours of work without a valid break."],
+      work15:["Work break in 15 minutes","About 15 minutes remain before six hours of work without a valid break."],
+      work5:["Work break in 5 minutes","About 5 minutes remain before six hours of work without a valid break."],
+      work0:["Work break indicated now","The local tracker reached six hours of work without a valid break of at least 15 minutes."],
+      weekly:["Weekly work approaching the reference",`Approximately ${n} remain before 60 hours of work this week.`],
+      weekly0:["Weekly work reference reached","The local tracker reached 60 hours of work this week."],
+      avg:["Four-month work average",`The local rolling average is about ${n} per week, approaching the 48-hour reference.`],
+      avg0:["48-hour average reference reached","The local four-month rolling average reached about 48 hours per week. Check the reference period applicable at your company."]
+    },
+    es:{
+      drive30:["Pausa de conducción en 30 minutos","Faltan unos 30 minutos para la referencia de 4 horas y 30 minutos de conducción."],
+      drive15:["Pausa de conducción en 15 minutos","Faltan unos 15 minutos para 4 horas y 30. Planifica una pausa de 45 minutos o, cuando corresponda, 15 más 30."],
+      drive5:["Pausa de conducción en 5 minutos","Faltan unos 5 minutos para 4 horas y 30."],
+      drive0:["Pausa de conducción indicada ahora","Se alcanzó la referencia de 4 horas y 30. Registra la pausa aplicable."],
+      work30:["Pausa de trabajo en 30 minutos","Faltan unos 30 minutos para seis horas de trabajo sin una pausa válida."],
+      work15:["Pausa de trabajo en 15 minutos","Faltan unos 15 minutos para seis horas de trabajo sin una pausa válida."],
+      work5:["Pausa de trabajo en 5 minutos","Faltan unos 5 minutos para seis horas de trabajo sin una pausa válida."],
+      work0:["Pausa de trabajo indicada ahora","El seguimiento local alcanzó seis horas de trabajo sin una pausa válida de al menos 15 minutos."],
+      weekly:["Trabajo semanal próximo a la referencia",`Faltan aproximadamente ${n} para 60 horas de trabajo esta semana.`],
+      weekly0:["Referencia semanal de trabajo alcanzada","El seguimiento local llegó a 60 horas de trabajo esta semana."],
+      avg:["Media de trabajo de cuatro meses",`La media móvil local es de aproximadamente ${n} por semana, cerca de la referencia de 48 horas.`],
+      avg0:["Referencia media de 48 horas alcanzada","La media móvil local de cuatro meses llegó a unas 48 horas semanales. Confirma el período de referencia aplicable en la empresa."]
+    },
+    fr:{
+      drive30:["Pause de conduite dans 30 minutes","Il reste environ 30 minutes avant la référence de 4 heures 30 de conduite."],
+      drive15:["Pause de conduite dans 15 minutes","Il reste environ 15 minutes avant 4 heures 30. Prévois une pause de 45 minutes ou, le cas échéant, 15 plus 30."],
+      drive5:["Pause de conduite dans 5 minutes","Il reste environ 5 minutes avant 4 heures 30."],
+      drive0:["Pause de conduite indiquée maintenant","La référence de 4 heures 30 est atteinte. Enregistre la pause applicable."],
+      work30:["Pause de travail dans 30 minutes","Il reste environ 30 minutes avant six heures de travail sans pause valable."],
+      work15:["Pause de travail dans 15 minutes","Il reste environ 15 minutes avant six heures de travail sans pause valable."],
+      work5:["Pause de travail dans 5 minutes","Il reste environ 5 minutes avant six heures de travail sans pause valable."],
+      work0:["Pause de travail indiquée maintenant","Le suivi local a atteint six heures de travail sans pause valable d’au moins 15 minutes."],
+      weekly:["Travail hebdomadaire proche de la référence",`Il reste environ ${n} avant 60 heures de travail cette semaine.`],
+      weekly0:["Référence hebdomadaire atteinte","Le suivi local a atteint 60 heures de travail cette semaine."],
+      avg:["Moyenne de travail sur quatre mois",`La moyenne mobile locale est d’environ ${n} par semaine, proche de la référence de 48 heures.`],
+      avg0:["Référence moyenne de 48 heures atteinte","La moyenne mobile locale sur quatre mois atteint environ 48 heures par semaine. Vérifie la période de référence applicable dans l’entreprise."]
+    },
+    de:{
+      drive30:["Fahrpause in 30 Minuten","Noch etwa 30 Minuten bis zur Referenz von 4 Stunden 30 Minuten Fahrzeit."],
+      drive15:["Fahrpause in 15 Minuten","Noch etwa 15 Minuten bis 4 Stunden 30. Plane eine Pause von 45 Minuten oder gegebenenfalls 15 plus 30."],
+      drive5:["Fahrpause in 5 Minuten","Noch etwa 5 Minuten bis 4 Stunden 30."],
+      drive0:["Fahrpause jetzt angezeigt","Die Referenz von 4 Stunden 30 ist erreicht. Erfasse die anwendbare Pause."],
+      work30:["Arbeitspause in 30 Minuten","Noch etwa 30 Minuten bis sechs Stunden Arbeit ohne gültige Pause."],
+      work15:["Arbeitspause in 15 Minuten","Noch etwa 15 Minuten bis sechs Stunden Arbeit ohne gültige Pause."],
+      work5:["Arbeitspause in 5 Minuten","Noch etwa 5 Minuten bis sechs Stunden Arbeit ohne gültige Pause."],
+      work0:["Arbeitspause jetzt angezeigt","Der lokale Zähler hat sechs Arbeitsstunden ohne gültige Pause von mindestens 15 Minuten erreicht."],
+      weekly:["Wochenarbeitszeit nähert sich der Referenz",`Noch ungefähr ${n} bis 60 Arbeitsstunden in dieser Woche.`],
+      weekly0:["Wochenarbeitszeit-Referenz erreicht","Der lokale Zähler hat 60 Arbeitsstunden in dieser Woche erreicht."],
+      avg:["Viermonatiger Arbeitszeitdurchschnitt",`Der lokale gleitende Durchschnitt liegt bei ungefähr ${n} pro Woche und nähert sich 48 Stunden.`],
+      avg0:["48-Stunden-Durchschnitt erreicht","Der lokale Viermonatsdurchschnitt liegt bei ungefähr 48 Stunden pro Woche. Prüfe den im Betrieb geltenden Bezugszeitraum."]
+    },
+    it:{
+      drive30:["Pausa di guida tra 30 minuti","Mancano circa 30 minuti al riferimento di 4 ore e 30 minuti di guida."],
+      drive15:["Pausa di guida tra 15 minuti","Mancano circa 15 minuti a 4 ore e 30. Pianifica una pausa di 45 minuti o, quando applicabile, 15 più 30."],
+      drive5:["Pausa di guida tra 5 minuti","Mancano circa 5 minuti a 4 ore e 30."],
+      drive0:["Pausa di guida indicata ora","È stato raggiunto il riferimento di 4 ore e 30. Registra la pausa applicabile."],
+      work30:["Pausa di lavoro tra 30 minuti","Mancano circa 30 minuti a sei ore di lavoro senza una pausa valida."],
+      work15:["Pausa di lavoro tra 15 minuti","Mancano circa 15 minuti a sei ore di lavoro senza una pausa valida."],
+      work5:["Pausa di lavoro tra 5 minuti","Mancano circa 5 minuti a sei ore di lavoro senza una pausa valida."],
+      work0:["Pausa di lavoro indicata ora","Il monitoraggio locale ha raggiunto sei ore di lavoro senza una pausa valida di almeno 15 minuti."],
+      weekly:["Lavoro settimanale vicino al riferimento",`Mancano circa ${n} a 60 ore di lavoro questa settimana.`],
+      weekly0:["Riferimento settimanale raggiunto","Il monitoraggio locale ha raggiunto 60 ore di lavoro questa settimana."],
+      avg:["Media di lavoro su quattro mesi",`La media mobile locale è di circa ${n} a settimana, vicino al riferimento di 48 ore.`],
+      avg0:["Riferimento medio di 48 ore raggiunto","La media mobile locale di quattro mesi ha raggiunto circa 48 ore settimanali. Verifica il periodo di riferimento applicabile in azienda."]
+    }
+  };
+  return (table[lang] || table.pt)[key] || table.pt[key] || ["Alerta","Verifica a situação atual."];
+}
+
 function alertEngine(metrics, now = new Date()) {
   // Reset break-alert cycle after a qualifying break/reset.
   if (metrics.continuous < 60) {
-    alarmKeys.delete("drive_415");
-    alarmKeys.delete("drive_430");
+    ["drive_400","drive_415","drive_425","drive_430"].forEach(k => alarmKeys.delete(k));
   }
 
   if ((journal.active?.type === "break" || journal.active?.type === "rest")) {
     if ($("alarmOverlay").classList.contains("show")) hideAlarm();
   }
 
-  if (journal.active?.type === "driving") {
-    if (metrics.continuous >= RULES.preAlert && metrics.continuous < RULES.continuousMax) {
-      showAlarm(
-        "drive_415",
-        "warning",
-        "Pré-alerta: 4h15 de condução",
-        "Faltam até 15 minutos para a referência de 4h30. Planeie a pausa de 45 min ou, quando aplicável, a divisão 15 + 30."
-      );
-    }
-    if (metrics.continuous >= RULES.continuousMax) {
-      showAlarm(
-        "drive_430",
-        "critical",
-        "Pausa indicada agora",
-        "A referência de 4h30 foi atingida. Registe a pausa: 45 min ou a segunda parte de 30 min se já existir uma primeira parte válida de pelo menos 15 min.",
-        true
-      );
-    }
+  if (journal.active?.type === "driving" && settings.driveAlerts) {
+    let msg = null, key = "", level = "warning", sticky = false;
+    if (metrics.continuous >= RULES.continuousMax) { msg = alertCopy("drive0"); key="drive_430"; level="critical"; sticky=true; }
+    else if (metrics.continuous >= RULES.continuousMax-5*60) { msg = alertCopy("drive5"); key="drive_425"; }
+    else if (metrics.continuous >= RULES.continuousMax-15*60) { msg = alertCopy("drive15"); key="drive_415"; }
+    else if (metrics.continuous >= RULES.continuousMax-30*60) { msg = alertCopy("drive30"); key="drive_400"; }
+    if (msg) showAlarm(key, level, msg[0], msg[1], sticky);
+  }
+
+  const workState = workTimeState(now);
+  if (workState.workSinceBreak < 60) ["work_530","work_545","work_555","work_600"].forEach(k => alarmKeys.delete(k));
+  if (settings.workBreakAlerts && journal.shiftStart && !journal.shiftEnd) {
+    let msg=null, key="", level="warning", sticky=false;
+    if (workState.workSinceBreak >= RULES.workBreakMax) { msg=alertCopy("work0"); key="work_600"; level="critical"; sticky=true; }
+    else if (workState.workSinceBreak >= RULES.workBreakMax-5*60) { msg=alertCopy("work5"); key="work_555"; }
+    else if (workState.workSinceBreak >= RULES.workBreakMax-15*60) { msg=alertCopy("work15"); key="work_545"; }
+    else if (workState.workSinceBreak >= RULES.workBreakMax-30*60) { msg=alertCopy("work30"); key="work_530"; }
+    if (msg) showAlarm(key, level, msg[0], msg[1], sticky);
+  }
+
+  if (settings.weeklyWorkAlerts) {
+    const weekKey = mondayStart(now).toISOString().slice(0,10);
+    let msg=null, key="", level="warning", sticky=false;
+    if (workState.weeklyWork >= 60*3600) { msg=alertCopy("weekly0"); key=`weekly60_${weekKey}`; level="critical"; sticky=true; }
+    else if (workState.weeklyWork >= 59*3600) { msg=alertCopy("weekly",{value:hm(1*3600)}); key=`weekly59_${weekKey}`; }
+    else if (workState.weeklyWork >= 58*3600) { msg=alertCopy("weekly",{value:hm(2*3600)}); key=`weekly58_${weekKey}`; }
+    else if (workState.weeklyWork >= 55*3600) { msg=alertCopy("weekly",{value:hm(5*3600)}); key=`weekly55_${weekKey}`; }
+    else if (workState.weeklyWork >= 50*3600) { msg=alertCopy("weekly",{value:hm(10*3600)}); key=`weekly50_${weekKey}`; }
+    if (msg) showAlarm(key, level, msg[0], msg[1], sticky);
+  }
+
+  if (settings.fourMonthAlerts && workState.completeFourMonthData) {
+    const avg = workState.fourMonthAverage;
+    let msg=null, key="", level="warning", sticky=false;
+    if (avg >= 48*3600) { msg=alertCopy("avg0"); key="avg48"; level="critical"; sticky=true; }
+    else if (avg >= 47*3600) { msg=alertCopy("avg",{value:hm(avg)}); key="avg47"; }
+    else if (avg >= 46*3600) { msg=alertCopy("avg",{value:hm(avg)}); key="avg46"; }
+    else if (avg >= 44*3600) { msg=alertCopy("avg",{value:hm(avg)}); key="avg44"; }
+    if (msg) showAlarm(key, level, msg[0], msg[1], sticky);
   }
 
   const rest = dailyRestProgress(now);
@@ -2154,7 +2439,7 @@ function renderHome(now = new Date(), full = true) {
     } else {
       $("restKind").textContent = "DESCANSO DIÁRIO EM CURSO";
       $("restReady").textContent = `Faltam ${hm(rest.leftToReduced)} para 9h. Depois, podes continuar até 11h para este repouso ficar regular.`;
-      $("nextShiftBtn").textContent = `BLOQUEADO • FALTAM ${hm(rest.leftToReduced)}`;
+      $("nextShiftBtn").textContent = `INICIAR COM AVISO • FALTAM ${hm(rest.leftToReduced)}`;
     }
     $("restReductionStatus").textContent = `Reduções diárias registadas: ${used}/3 • restantes ${Math.max(0,3-used)}.`;
     const weeklyCandidate = $("restWeeklyStatus");
@@ -2175,6 +2460,20 @@ function renderHome(now = new Date(), full = true) {
   }
 
   renderHomeCompensation(now);
+  const wt = workTimeState(now);
+  if ($("workBreakStatus")) $("workBreakStatus").textContent = activeShift
+    ? (wt.workBreakLeft > 0 ? `${hm(wt.workSinceBreak)} desde a última pausa válida • faltam ${hm(wt.workBreakLeft)} para 6h` : `${hm(wt.workSinceBreak)} • referência de 6h atingida`)
+    : "Sem jornada ativa.";
+  if ($("weeklyWorkStatus")) $("weeklyWorkStatus").textContent = `${hm(wt.weeklyWork)} esta semana • faltam ${hm(wt.weeklyWorkLeft)} para 60h`;
+  if ($("fourMonthWorkStatus")) $("fourMonthWorkStatus").textContent = wt.completeFourMonthData
+    ? `Média móvel observada: ${hm(wt.fourMonthAverage)} / 48h`
+    : `Histórico local insuficiente para fechar 4 meses • média parcial ${hm(wt.fourMonthAverage)}`;
+  if ($("workComplianceCard")) {
+    const danger = wt.weeklyWork >= RULES.weeklyWorkMax || (wt.completeFourMonthData && wt.fourMonthAverage >= RULES.fourMonthAverageMax) || wt.workSinceBreak >= RULES.workBreakMax;
+    const warn = !danger && (wt.weeklyWork >= 55*3600 || wt.workSinceBreak >= 5.5*3600 || (wt.completeFourMonthData && wt.fourMonthAverage >= 46*3600));
+    $("workComplianceCard").className = `workComplianceCard ${danger ? "bad" : warn ? "warn" : ""}`;
+  }
+  renderTechnicalObservations();
   alertEngine(metrics, now);
   renderCopilot(metrics, next);
 
@@ -3004,6 +3303,11 @@ function exportBackup() {
 function updateSettings() {
   settings.sound = $("soundToggle").checked;
   settings.vibration = $("vibrationToggle").checked;
+  settings.voiceAlerts = $("voiceAlertsToggle")?.checked ?? settings.voiceAlerts;
+  settings.driveAlerts = $("driveAlertsToggle")?.checked ?? settings.driveAlerts;
+  settings.workBreakAlerts = $("workBreakAlertsToggle")?.checked ?? settings.workBreakAlerts;
+  settings.weeklyWorkAlerts = $("weeklyWorkAlertsToggle")?.checked ?? settings.weeklyWorkAlerts;
+  settings.fourMonthAlerts = $("fourMonthAlertsToggle")?.checked ?? settings.fourMonthAlerts;
   safeSave(STORAGE.settings, settings);
   if (settings.sound) ensureAudio();
 }
@@ -3096,14 +3400,14 @@ function setupEvents() {
       if (journal.shiftEnd && journal.dailyRest) {
         if (when <= new Date(journal.dailyRest.startedAt)) throw new Error("A nova jornada deve começar depois do início do descanso.");
         const p = dailyRestProgress(when);
-        if (!p.reducedReady) {
-          const msg = `Repouso realizado: ${hms(p.elapsed)}. Ainda faltam ${hms(p.leftToReduced)} para completar o mínimo de 9 horas. A nova jornada permanece bloqueada.`;
-          $("startJourneyMsg").textContent = msg;
+        const warning = earlyStartWarningState(when);
+        if (warning) {
+          $("startJourneyMsg").textContent = warning.message;
           $("startJourneyMsg").className = "msg err";
-          showAlarm(`rest_block_${Date.now()}`, "critical", "Ainda não pode iniciar a jornada", msg, true);
-          return;
-        }
-        if (p.reducedReady && !p.regularReady && p.reducedAvailable && !confirm(`Este repouso será registado como reduzido (${p.reductions.reducedActual+1}/3). Continuar?`)) return;
+          showAlarm(`rest_warning_${Date.now()}`, "critical", "Atenção antes de iniciar a jornada", warning.message, true);
+          if (!confirm(`${warning.message}\n\nSe prosseguires, esta confirmação ficará apenas no relatório técnico de avisos. O relatório principal não será alterado.\n\nProsseguir mesmo assim?`)) return;
+          logEarlyStartWarning(warning, "screen");
+        } else if (p.reducedReady && !p.regularReady && p.reducedAvailable && !confirm(`Este repouso será registado como reduzido (${p.reductions.reducedActual+1}/3). Continuar?`)) return;
         startNextShift(when, country);
       } else {
         startShift(when, country);
@@ -3285,8 +3589,14 @@ function setupEvents() {
 
   $("soundToggle").checked = settings.sound;
   $("vibrationToggle").checked = settings.vibration;
-  $("soundToggle").onchange = updateSettings;
-  $("vibrationToggle").onchange = updateSettings;
+  if ($("voiceAlertsToggle")) $("voiceAlertsToggle").checked = settings.voiceAlerts;
+  if ($("driveAlertsToggle")) $("driveAlertsToggle").checked = settings.driveAlerts;
+  if ($("workBreakAlertsToggle")) $("workBreakAlertsToggle").checked = settings.workBreakAlerts;
+  if ($("weeklyWorkAlertsToggle")) $("weeklyWorkAlertsToggle").checked = settings.weeklyWorkAlerts;
+  if ($("fourMonthAlertsToggle")) $("fourMonthAlertsToggle").checked = settings.fourMonthAlerts;
+  ["soundToggle","vibrationToggle","voiceAlertsToggle","driveAlertsToggle","workBreakAlertsToggle","weeklyWorkAlertsToggle","fourMonthAlertsToggle"].forEach(id => {
+    if ($(id)) $(id).onchange = updateSettings;
+  });
 
   $("reportPreviewBtn").onclick = () => {
     const preview = $("reportPreview");
@@ -3361,6 +3671,27 @@ function setupEvents() {
     } catch(e) { setReportActionStatus(e.message, "err"); }
   };
   $("backupBtn").onclick = exportBackup;
+  if ($("technicalPdfBtn")) $("technicalPdfBtn").onclick = () => {
+    downloadBlob(createPdfBlob(technicalReportLines()), `TachoControl_Tecnico_${fileDate()}.pdf`);
+  };
+  if ($("backgroundQuickBtn")) $("backgroundQuickBtn").onclick = () => {
+    persist();
+    stopVoiceRecognition();
+    speakAlert("TachoControl pronto para segundo plano. Usa o gesto Home do telemóvel.");
+    alert("TachoControl está preparado para segundo plano. Usa o botão/gesto Home do telemóvel para minimizar. Os contadores continuam pelos horários gravados.");
+  };
+  if ($("sessionExitBtn")) $("sessionExitBtn").onclick = () => {
+    persist();
+    settings.voiceHandsFree = false;
+    safeSave(STORAGE.settings, settings);
+    stopVoiceRecognition();
+    $("sessionClosedOverlay")?.classList.add("show");
+    speakAlert("Sessão encerrada.");
+  };
+  if ($("sessionReopenBtn")) $("sessionReopenBtn").onclick = () => {
+    $("sessionClosedOverlay")?.classList.remove("show");
+    renderHome(new Date(), true);
+  };
 
   $("weekly45Btn").onclick = () => {
     journal.weeklyRest = { kind:"regular", startedAt:new Date().toISOString(), targetSeconds:RULES.weeklyRestRegular };
@@ -3400,7 +3731,7 @@ function speak(text) {
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "pt-PT";
+    u.lang = voiceLocale();
     u.rate = 1.0;
     u.pitch = 1.0;
     speechSynthesis.speak(u);
@@ -3448,6 +3779,10 @@ const VOICE_COUNTRIES = [
   ["grecia","GR","Grécia"],["chipre","CY","Chipre"],["malta","M","Malta"],
   ["islandia","IS","Islândia"],["liechtenstein","FL","Liechtenstein"],["servia","SRB","Sérvia"],
   ["bosnia","BIH","Bósnia e Herzegovina"],["montenegro","MNE","Montenegro"],
+  ["spain","E","Espanha"],["espana","E","Espanha"],["espagne","E","Espanha"],["spanien","E","Espanha"],["spagna","E","Espanha"],
+  ["france","F","França"],["francia","F","França"],["frankreich","F","França"],
+  ["germany","D","Alemanha"],["deutschland","D","Alemanha"],["allemagne","D","Alemanha"],["alemania","D","Alemanha"],["germania","D","Alemanha"],
+  ["italy","I","Itália"],["italie","I","Itália"],
   ["macedonia do norte","MK","Macedónia do Norte"],["albania","AL","Albânia"]
 ];
 
@@ -3586,12 +3921,57 @@ function ensureShiftForVoice() {
   }
 }
 
+
+function voiceCanonicalPhrase(rawPhrase) {
+  let p = normalizeVoicePhrase(rawPhrase);
+  const actionMap = [
+    ["iniciar jornada",["iniciar jornada","inicia jornada","comecar jornada","comeca jornada","iniciar turno","comecar turno","start shift","start my shift","begin shift","start workday","empezar jornada","comenzar jornada","empezar turno","commencer la journee","demarrer la journee","commencer le service","demarrer le service","schicht starten","schicht beginnen","dienst beginnen","arbeitstag beginnen","iniziare turno","inizia turno","iniziare giornata","cominciare turno"]],
+    ["finalizar jornada",["finalizar jornada","finalizar turno","terminar jornada","terminar turno","fim de jornada","end shift","finish shift","finish my shift","close shift","end workday","fin de jornada","terminer la journee","fin de journee","terminer le service","fin de service","schicht beenden","dienst beenden","feierabend","terminare turno","fine turno","terminare giornata"]],
+    ["iniciar conducao",["iniciar conducao","inicia conducao","comecar a conduzir","vou conduzir","vou dirigir","start driving","begin driving","start to drive","i am driving","im driving","iniciar conduccion","empezar a conducir","voy a conducir","commencer a conduire","demarrer la conduite","je conduis","fahrt starten","fahren starten","ich fahre","iniziare guida","inizia guida","cominciare a guidare","sto guidando"]],
+    ["iniciar cama",["iniciar pausa","comecar pausa","vou descansar","cama","start break","take a break","start rest","rest now","iniciar pausa","empezar descanso","voy a descansar","commencer la pause","prendre une pause","commencer le repos","pause starten","ruhezeit starten","pausa machen","iniziare pausa","fare una pausa","iniziare riposo"]],
+    ["iniciar disponibilidade",["iniciar disponibilidade","estou disponivel","start availability","available now","on availability","iniciar disponibilidad","estoy disponible","commencer disponibilite","je suis disponible","bereitschaft starten","ich bin verfugbar","iniziare disponibilita","sono disponibile"]],
+    ["iniciar outro trabalho",["iniciar outro trabalho","iniciar trabalho","martelo","start other work","start work","other work","iniciar otro trabajo","empezar trabajo","commencer autre travail","commencer le travail","andere arbeit starten","arbeit starten","iniziare altro lavoro","iniziare lavoro"]],
+    ["iniciar ferry",["estou em ferry","iniciar ferry","ferry train","ferry trem","ferry comboio","on ferry","start ferry","on the ferry","en ferry","sur le ferry","auf der fahre","traghetto","sul traghetto"]],
+    ["abrir relatorio",["abrir relatorio","ver relatorio","abre relatorio","open report","show report","abrir informe","ver informe","ouvrir rapport","afficher rapport","bericht offnen","bericht anzeigen","aprire rapporto","mostra rapporto"]],
+    ["historico",["abrir historico","mostrar historico","open history","show history","abrir historial","mostrar historial","ouvrir historique","historique","verlauf offnen","verlauf","aprire storico","mostra storico"]],
+    ["sair do aplicativo",["sair do aplicativo","sair do app","fechar aplicativo","exit app","close app","leave app","salir de la aplicacion","cerrar aplicacion","quitter application","fermer application","app beenden","anwendung schliessen","uscire dall app","chiudere app"]],
+    ["minimizar aplicativo",["minimizar aplicativo","minimizar app","segundo plano","minimize app","background app","minimizar aplicacion","reduire application","arriere plan","app minimieren","hintergrund","minimizzare app","secondo piano"]]
+  ];
+  for (const [canonical, terms] of actionMap) if (terms.some(t => p.includes(normalizeVoicePhrase(t)))) return `${p} ${canonical}`;
+  return p;
+}
+function voiceConfirmIntent(p) {
+  return voiceHasAny(p,["confirmo","confirmar","sim pode","pode prosseguir","prosseguir","yes confirm","confirm","go ahead","si confirmo","oui je confirme","confirmer","ja bestatigen","bestatigen","si confermo","confermo"]);
+}
+function voiceCancelIntent(p) {
+  return voiceHasAny(p,["cancelar","cancela","nao","stop","cancel","no cancel","annuler","non","abbrechen","nein","annulla"]);
+}
+
 function executeVoiceCommand(rawPhrase) {
-  const p = normalizeVoicePhrase(rawPhrase);
+  let p = voiceCanonicalPhrase(rawPhrase);
   if (!p) return { ok:false, message:"Não ouvi nenhum comando." };
 
   try {
     const now = new Date();
+
+    if (voicePendingAction) {
+      if (voiceCancelIntent(p)) {
+        voicePendingAction = null;
+        return {ok:true,message:"Operação cancelada.",action:"cancel"};
+      }
+      if (voiceConfirmIntent(p)) {
+        const pending = voicePendingAction;
+        voicePendingAction = null;
+        if (pending.kind === "early_start_shift") {
+          const when = new Date(pending.when);
+          const warning = earlyStartWarningState(when);
+          if (warning) logEarlyStartWarning(warning, "voice");
+          startNextShift(when, pending.country || defaultJourneyCountry());
+          return {ok:true,message:`Jornada iniciada às ${shortTime(when)}. A confirmação ficou no relatório técnico.`,action:"start_shift"};
+        }
+      }
+      return {ok:false,message:"Há uma confirmação pendente. Diz “confirmo” para prosseguir ou “cancelar”.",action:"confirm_pending"};
+    }
 
     if (voiceHasAny(p, ["ajuda", "o que posso falar", "comandos", "exemplos de voz"])) {
       return { ok:true, message:voiceHelpText(), action:"help" };
@@ -3604,6 +3984,19 @@ function executeVoiceCommand(rawPhrase) {
     )) {
       registerCountryChange(spokenCountry, now, "voice");
       return { ok:true, message:`País registado: ${spokenCountry.name}${spokenCountry.region ? `, ${spokenCountry.region}` : ""}.`, action:"country" };
+    }
+
+    if (voiceHasAny(p, ["sair do aplicativo"])) {
+      persist();
+      settings.voiceHandsFree = false;
+      safeSave(STORAGE.settings, settings);
+      setTimeout(() => $("sessionClosedOverlay")?.classList.add("show"), 80);
+      return {ok:true,message:"Sessão encerrada.",action:"exit_app"};
+    }
+    if (voiceHasAny(p, ["minimizar aplicativo"])) {
+      persist();
+      setTimeout(() => alert("TachoControl está preparado para segundo plano. Usa o botão/gesto Home do telemóvel para minimizar."), 80);
+      return {ok:true,message:"Aplicação pronta para segundo plano. Usa o gesto Home do telemóvel.",action:"background"};
     }
 
     // Relatórios e partilha.
@@ -3765,17 +4158,19 @@ function executeVoiceCommand(rawPhrase) {
     }
     if (voiceHasAny(p, ["jornada", "turno", "servico"]) && /\b(inicia|iniciar|inicio|iniciando|comeca|comecar|comecei|abrir|entrei)\b/.test(p)) {
       const when = voiceCommandTime(p, now);
+      const country = defaultJourneyCountry();
       if (journal.shiftStart && !journal.shiftEnd) return {ok:true,message:"A jornada já está ativa.",action:"query"};
       if (journal.shiftEnd && journal.dailyRest) {
-        const rest = dailyRestProgress(when);
-        if (rest && !rest.complete) {
-          return {ok:false,message:`O descanso ainda não atingiu a meta necessária. Faltam ${hm(rest.left)}.`,action:"rest_block"};
+        const warning = earlyStartWarningState(when);
+        if (warning) {
+          voicePendingAction = {kind:"early_start_shift",when:when.toISOString(),country};
+          return {ok:true,message:`${warning.message} Se quiseres prosseguir, diz “confirmo”. Para desistir, diz “cancelar”.`,action:"confirm_needed"};
         }
-        startNextShift(when, journal.currentCountry);
+        startNextShift(when, country);
       } else {
-        startShift(when, journal.currentCountry);
+        startShift(when, country);
       }
-      return {ok:true,message:`Jornada iniciada às ${shortTime(when)} em Cama/Pausa.`,action:"start_shift"};
+      return {ok:true,message:`Jornada iniciada às ${shortTime(when)}. A condução só começa quando deres o comando de condução.`,action:"start_shift"};
     }
 
     // Ferry / comboio.
@@ -3948,8 +4343,8 @@ function setupVoice() {
 
   voiceRecognition = new SpeechRecognition();
   {
-    const deviceLang = String(navigator.language || "pt-PT");
-    voiceRecognition.lang = deviceLang.toLowerCase().startsWith("pt") ? deviceLang : "pt-PT";
+    const lang = typeof resolvedLanguage === "function" ? resolvedLanguage() : "pt";
+    voiceRecognition.lang = ({pt:"pt-PT",en:"en-US",es:"es-ES",fr:"fr-FR",de:"de-DE",it:"it-IT"})[lang] || String(navigator.language || "pt-PT");
   }
   voiceRecognition.interimResults = false;
   voiceRecognition.maxAlternatives = 5;
