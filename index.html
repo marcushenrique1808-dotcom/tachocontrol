@@ -363,7 +363,7 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
 }
 
 
-/* v1.13.5 — relatórios, voz e último fim */
+/* v1.13.6 — relatórios, voz e último fim */
 .lastShiftEndMini{float:left;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:7px;align-items:center;margin:8px 10px 8px 0;padding:7px 9px;border:1px solid #2b383e;border-radius:11px;background:#0b1114;min-width:128px}
 .lastShiftEndMini span{grid-column:1/-1;font-size:8px;font-weight:950;color:#8e9c95;letter-spacing:.08em}.lastShiftEndMini b{font-size:15px;font-variant-numeric:tabular-nums;color:#fff}.lastShiftEndMini small{font-size:9px;color:#9eaaa4}
 .reportActionStatus{margin-top:8px;padding:8px 10px;border:1px solid #2c3a40;border-radius:10px;background:#0b1215;color:#aebbb5;font-size:10px;line-height:1.4}.reportActionStatus.ok{border-color:#34734f;color:#c7ffdc;background:#0e1d14}.reportActionStatus.warn{border-color:#a8772b;color:#ffe0a5;background:#211809}.reportActionStatus.err{border-color:#a6404b;color:#ffc4ca;background:#241014}
@@ -775,7 +775,7 @@ body.reduce-motion .amplitudeBlink,body.reduce-motion .amplitudeNearLimit,body.r
         </div>
         <p class="small">Serve para testar a lógica quando o visualizador local bloquear o microfone. No PWA/HTTPS, usa a voz normalmente.</p>
       </details>
-      <p class="small">Frases: “iniciar jornada”, “iniciar condução”, “vou conduzir”, “estou em condução”, “estou em cama”, “martelo”, “estou disponível”, “estou em outro trabalho”, “estou em ferry train”, “mudei de país para Espanha”, “fim de jornada”.</p>
+      <p class="small">Fala naturalmente: “comecei a jornada”, “agora vou dirigir”, “coloca pausa”, “estou em ferry”, “ferry em descanso”, “muda para disponibilidade”, “terminei a jornada”, “abre o relatório”, “guarda o PDF”, “mostra o histórico”, “quanto falta para a pausa”. Não precisas decorar uma frase exata.</p>
     </details>
   </div>
 
@@ -3501,29 +3501,88 @@ function voiceCommandTime(normalized, now = new Date()) {
 }
 
 function voiceHelpText() {
-  return "Comandos: iniciar jornada; iniciar condução; vou conduzir; estou em condução; estou em cama; martelo; estou disponível; estou em outro trabalho; estou em ferry train; mudei de país para Espanha; fim de jornada.";
+  return "Podes falar de forma natural. Exemplos: começa a jornada; agora vou dirigir; coloca pausa; estou em ferry; ferry em descanso; muda para disponibilidade; terminei a jornada; abre o relatório; guarda o PDF; partilha o relatório; mostra o histórico; quanto falta para a pausa; quanto conduzi hoje; qual o meu estado; qual a compensação semanal.";
 }
 
 function normalizeVoicePhrase(text) {
   return String(text || "")
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[.,!?;:]/g, " ")
+    .replace(/[.,!?;:()[\]{}"'`´]/g, " ")
+    .replace(/\b(por favor|faz favor|se faz favor|tacho control|tachocontrol)\b/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
+function voiceHasAny(p, terms) {
+  return terms.some(term => p.includes(term));
+}
+
+function voiceActionish(p) {
+  return /\b(estou|to|tou|agora|inicia|iniciar|inicio|iniciando|comeca|comecar|comecei|vou|muda|mudar|troca|trocar|coloca|colocar|passei|passar|entrei|entrar|registra|registrar|marca|marcar|ativa|ativar)\b/.test(p);
+}
+
+function voiceActivityRequested(p, terms) {
+  const exact = terms.some(term => p === term);
+  return exact || (voiceActionish(p) && voiceHasAny(p, terms));
+}
+
+function voiceOpenReportAccess() {
+  openTab("more");
+  const details = $("reportAccess");
+  if (details) details.open = true;
+  setTimeout(() => details?.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+}
+
+function voiceOpenReportPreview() {
+  voiceOpenReportAccess();
+  renderReportPreview();
+  if ($("reportPreviewBtn")) $("reportPreviewBtn").textContent = "OCULTAR RELATÓRIO";
+  setReportActionStatus("Relatório aberto por comando de voz.", "ok");
+  setTimeout(() => $("reportPreview")?.scrollIntoView({behavior:"smooth", block:"start"}), 100);
+}
+
+function voiceSetPreference(kind, enabled) {
+  if (kind === "sound") {
+    settings.sound = enabled;
+    if ($("soundToggle")) $("soundToggle").checked = enabled;
+  } else if (kind === "vibration") {
+    settings.vibration = enabled;
+    if ($("vibrationToggle")) $("vibrationToggle").checked = enabled;
+  } else if (kind === "spoken") {
+    settings.spokenConfirmations = enabled;
+    if ($("spokenConfirmationsHidden")) $("spokenConfirmationsHidden").checked = enabled;
+  }
+  safeSave(STORAGE.settings, settings);
+}
+
+function voiceRecognitionScore(text) {
+  const p = normalizeVoicePhrase(text);
+  if (!p) return -100;
+  const keys = [
+    "jornada","turno","conducao","conduzir","dirigir","dirigindo","pausa","cama","descanso","repouso",
+    "trabalho","martelo","disponibilidade","disponivel","ferry","ferri","balsa","comboio","trem","train",
+    "relatorio","pdf","historico","copiloto","compensacao","semanal","pais","portugal","espanha","franca",
+    "quanto","falta","estado","agora","whatsapp","email","imprimir","backup","instalar"
+  ];
+  let score = 0;
+  for (const k of keys) if (p.includes(k)) score += k.length > 7 ? 3 : 2;
+  if (voiceActionish(p)) score += 2;
+  if (/\b(abrir|abre|mostrar|mostra|ver|ve|quero|qual|quanto|quando|posso)\b/.test(p)) score += 2;
+  return score;
+}
+
 function ensureShiftForVoice() {
   if (!journal.shiftStart) {
-    startShift(new Date());
+    startShift(new Date(), journal.currentCountry);
     return;
   }
   if (journal.shiftEnd) {
     const rest = dailyRestProgress();
     if (rest && !rest.complete) {
-      throw new Error(`O descanso ainda está em curso. Faltam ${hm(rest.left)}. Para iniciar antes da meta, usa o botão na tela para confirmar.`);
+      throw new Error(`O descanso ainda está em curso. Faltam ${hm(rest.left)} para a meta necessária antes da próxima jornada.`);
     }
-    startNextShift();
+    startNextShift(new Date(), journal.currentCountry);
   }
 }
 
@@ -3532,129 +3591,269 @@ function executeVoiceCommand(rawPhrase) {
   if (!p) return { ok:false, message:"Não ouvi nenhum comando." };
 
   try {
-    if (p.includes("ajuda") || p.includes("comandos")) {
+    const now = new Date();
+
+    if (voiceHasAny(p, ["ajuda", "o que posso falar", "comandos", "exemplos de voz"])) {
       return { ok:true, message:voiceHelpText(), action:"help" };
     }
 
-    if (p.includes("mudei de pais") || p.includes("mudanca de pais") || p.startsWith("pais ")) {
-      const country = countryFromVoicePhrase(p);
-      if (!country) return { ok:false, message:"Ouvi a mudança de país, mas não reconheci o país." };
-      registerCountryChange(country, new Date(), "voice");
-      return { ok:true, message:`País registado: ${country.name}${country.region ? `, ${country.region}` : ""}.`, action:"country" };
+    const spokenCountry = countryFromVoicePhrase(p);
+    if (spokenCountry && (
+      voiceHasAny(p, ["mudei", "mudanca", "mudar de pais", "entrei", "cheguei", "cruzei", "fronteira", "pais"]) ||
+      p.startsWith("agora estou em ")
+    )) {
+      registerCountryChange(spokenCountry, now, "voice");
+      return { ok:true, message:`País registado: ${spokenCountry.name}${spokenCountry.region ? `, ${spokenCountry.region}` : ""}.`, action:"country" };
     }
 
-    // Jornada: aceita formas naturais e curtas.
-    if (
-      p.includes("iniciar jornada") ||
-      p.includes("inicio de jornada") ||
-      p.includes("iniciei jornada") ||
-      p.includes("comecar jornada") ||
-      p.includes("comecar a jornada") ||
-      p.includes("abrir jornada")
-    ) {
-      const when = voiceCommandTime(p, new Date());
-      if (journal.shiftStart && !journal.shiftEnd) {
-        return { ok:true, message:"A jornada já está ativa.", action:"query" };
+    // Relatórios e partilha.
+    if (voiceHasAny(p, ["relatorio", "relatorios", "pdf", "resumo"])) {
+      const monthly = voiceHasAny(p, ["mes", "mensal"]);
+      if (monthly && voiceHasAny(p, ["partilhar", "compartilhar", "enviar", "manda", "mandar"])) {
+        openTab("more");
+        $("currentMonthShareBtn")?.click();
+        return {ok:true,message:"A preparar o relatório mensal para partilha.",action:"month_share"};
       }
-      if (journal.shiftEnd && journal.dailyRest) {
-        const rest = dailyRestProgress(when);
-        if (rest && !rest.reducedReady) {
-          return { ok:false, message:"O descanso ainda não chegou a 9 horas. Para iniciar antes, usa o botão da tela para confirmar." };
-        }
-        startNextShift(when);
-      } else {
-        startShift(when);
+      if (monthly && voiceHasAny(p, ["pdf", "guardar", "salvar", "baixar", "download"])) {
+        openTab("more");
+        $("currentMonthPdfBtn")?.click();
+        return {ok:true,message:"A preparar o PDF do mês.",action:"month_pdf"};
       }
-      return { ok:true, message:`Jornada iniciada às ${shortTime(when)} em Cama.`, action:"start_shift" };
+      if (voiceHasAny(p, ["whatsapp"])) {
+        voiceOpenReportAccess();
+        $("whatsAppShareBtn")?.click();
+        return {ok:true,message:"A abrir a partilha do resumo no WhatsApp.",action:"report_whatsapp"};
+      }
+      if (voiceHasAny(p, ["email", "e-mail", "correio"])) {
+        voiceOpenReportAccess();
+        $("emailShareBtn")?.click();
+        return {ok:true,message:"A abrir o email com o resumo.",action:"report_email"};
+      }
+      if (voiceHasAny(p, ["imprimir", "imprime", "impressao"])) {
+        voiceOpenReportAccess();
+        $("printBtn")?.click();
+        return {ok:true,message:"A abrir o painel de impressão.",action:"report_print"};
+      }
+      if (voiceHasAny(p, ["copiar", "copia"])) {
+        voiceOpenReportAccess();
+        $("copyShareBtn")?.click();
+        return {ok:true,message:"A copiar o resumo do relatório.",action:"report_copy"};
+      }
+      if (voiceHasAny(p, ["partilhar", "compartilhar", "enviar", "manda", "mandar"])) {
+        voiceOpenReportAccess();
+        $("shareBtn")?.click();
+        return {ok:true,message:"A preparar o PDF para partilha.",action:"report_share"};
+      }
+      if (voiceHasAny(p, ["guardar", "salvar", "baixar", "download"])) {
+        voiceOpenReportAccess();
+        $("pdfBtn")?.click();
+        return {ok:true,message:"A preparar o PDF para guardar.",action:"report_save"};
+      }
+      voiceOpenReportPreview();
+      return {ok:true,message:"Relatório aberto.",action:"report_open"};
     }
 
-    if (
-      p.includes("fim de jornada") ||
-      p.includes("finalizar jornada") ||
-      p.includes("terminando jornada") ||
-      p.includes("terminar jornada") ||
-      p.includes("fechar jornada")
-    ) {
-      if (!journal.shiftStart || journal.shiftEnd) return { ok:false, message:"Não há jornada ativa para finalizar." };
-      const when = voiceCommandTime(p, new Date());
-      finishShift(when);
-      return { ok:true, message:`Jornada finalizada às ${shortTime(when)}. Cama iniciada.`, action:"finish_shift" };
+    // Navegação.
+    if (voiceHasAny(p, ["historico", "meus registos", "meus registros"])) {
+      openTab("history");
+      return {ok:true,message:"Histórico aberto.",action:"nav_history"};
+    }
+    if (voiceHasAny(p, ["copiloto", "assistente"])) {
+      openTab("copilot");
+      return {ok:true,message:"Copiloto aberto.",action:"nav_copilot"};
+    }
+    if (voiceHasAny(p, ["configuracoes", "configuracao", "preferencias", "menu mais", "mais opcoes"])) {
+      openTab("more");
+      return {ok:true,message:"Menu Mais aberto.",action:"nav_more"};
+    }
+    if (voiceHasAny(p, ["tela inicial", "ecra inicial", "pagina inicial", "voltar ao agora", "abrir agora"])) {
+      openTab("now");
+      return {ok:true,message:"Tela Agora aberta.",action:"nav_now"};
+    }
+    if (voiceHasAny(p, ["perfil", "matricula", "nome do condutor"]) && voiceHasAny(p, ["abrir", "abre", "editar", "mudar", "alterar"])) {
+      openTab("more");
+      $("profileQuickBtn")?.click();
+      return {ok:true,message:"Perfil aberto para edição.",action:"profile"};
     }
 
-    // Condução: aceita as expressões que o motorista usou na conversa.
-    if (
-      p.includes("estou em conducao") ||
-      p.includes("estou conduzindo") ||
-      p.includes("estou a conduzir") ||
-      p.includes("iniciar conducao") ||
-      p.includes("inicio de conducao") ||
-      p.includes("vou conduzir") ||
-      p === "conducao"
-    ) {
-      ensureShiftForVoice();
-      const changed = switchActivity("driving", new Date());
-      return { ok:true, message:changed ? "Condução registada agora." : "Já estás em condução; o cronómetro continua.", action:"driving" };
+    // Consultas, antes das atividades.
+    if (voiceHasAny(p, ["quanto falta para pausa", "quanto falta pra pausa", "tempo para pausa", "quando tenho que parar", "quando tenho de parar"])) {
+      const m = computeMetrics(now);
+      return { ok:true, message:`Faltam ${hms(m.continuousLeft)} para a referência contínua de 4 horas e 30.`, action:"query_break" };
     }
-
-    if (
-      p.includes("estou em cama") ||
-      p.includes("iniciar cama") ||
-      p === "cama" ||
-      p.includes("vou descansar")
-    ) {
-      ensureShiftForVoice();
-      const changed = switchActivity("rest", new Date());
-      return { ok:true, message:changed ? "Cama registada agora." : "Já estás em Cama; o cronómetro continua.", action:"rest" };
+    if (voiceHasAny(p, ["quanto conduzi", "quanto dirigi", "tempo de conducao", "tempo dirigindo"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Condução desta jornada: ${hm(m.drivingShift)}.`,action:"query_drive"};
     }
-
-    if (
-      p.includes("estou disponivel") ||
-      p.includes("estou em disponibilidade") ||
-      p.includes("iniciar disponibilidade") ||
-      p === "disponibilidade" ||
-      p === "disponivel"
-    ) {
-      ensureShiftForVoice();
-      const changed = switchActivity("availability", new Date());
-      return { ok:true, message:changed ? "Disponibilidade registada agora." : "Já estás disponível; o cronómetro continua.", action:"availability" };
+    if (voiceHasAny(p, ["quanto posso conduzir hoje", "quanto posso dirigir hoje", "quanto resta de conducao hoje"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Saldo diário de referência de 9 horas: ${hm(m.dailyNormalLeft)}. Até 10 horas, quando aplicável no teu caso: ${hm(m.dailyExtendedLeft)}.`,action:"query_daily"};
     }
-
-    if (
-      p.includes("estou em outro trabalho") ||
-      p.includes("estou em outros trabalhos") ||
-      p.includes("iniciar outro trabalho") ||
-      p.includes("iniciar trabalho") ||
-      p === "martelo" ||
-      p.includes("estou em martelo")
-    ) {
-      ensureShiftForVoice();
-      const changed = switchActivity("other_work", new Date());
-      return { ok:true, message:changed ? "Outros trabalhos registados agora." : "Já estás em outros trabalhos; o cronómetro continua.", action:"other_work" };
+    if (voiceHasAny(p, ["tempo semanal", "conducao semanal", "quanto conduzi na semana", "quanto falta na semana"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Condução na semana: ${hm(m.weeklyDriving)}. Saldo até 56 horas: ${hm(m.weeklyLeft)}.`,action:"query_week"};
     }
-
-    if (
-      p.includes("estou em ferry train") ||
-      p.includes("estou em ferry trem") ||
-      p.includes("estou em ferry comboio") ||
-      p.includes("iniciar ferry") ||
-      p.includes("ferry train") ||
-      p.includes("ferry trem")
-    ) {
-      ensureShiftForVoice();
-      const changed = switchActivity("ferry_availability", new Date());
-      return { ok:true, message:changed ? "Ferry ou comboio registado em disponibilidade." : "O estado Ferry/Comboio já está ativo.", action:"ferry_availability" };
+    if (voiceHasAny(p, ["duas semanas", "quinzena", "90 horas", "noventa horas"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Condução nas duas semanas consideradas: ${hm(m.fortnightDriving)}. Saldo até 90 horas: ${hm(m.fortnightLeft)}.`,action:"query_fortnight"};
     }
-
-    if (p.includes("quanto falta para pausa") || p.includes("quanto falta pra pausa")) {
-      const m = computeMetrics();
-      return { ok:true, message:`Saldo contínuo: ${hms(m.continuousLeft)}.`, action:"query" };
+    if (voiceHasAny(p, ["tempo de trabalho", "quanto trabalhei", "outros trabalhos hoje"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Tempo de trabalho registado nesta jornada: ${hm(m.workShift)}.`,action:"query_work"};
     }
-
-    if (p.includes("estado atual") || p.includes("como estou")) {
+    if (voiceHasAny(p, ["tempo de disponibilidade", "quanto tempo disponivel", "quanto fiquei disponivel"])) {
+      const m = computeMetrics(now);
+      return {ok:true,message:`Disponibilidade registada nesta jornada: ${hm(m.availabilityShift)}.`,action:"query_availability"};
+    }
+    if (voiceHasAny(p, ["amplitude", "tempo de jornada"])) {
+      const m = computeMetrics(now);
+      const a = amplitudeState(m, now);
+      if (!a) return {ok:true,message:"Não há jornada ativa para calcular a amplitude.",action:"query_amplitude"};
+      return {ok:true,message:`Amplitude atual: ${hm(a.elapsed)}. Restam ${hm(a.regularReferenceLeft)} para a referência de 13 horas e ${hm(a.reducedReferenceLeft)} para a referência de 15 horas.`,action:"query_amplitude"};
+    }
+    if (voiceHasAny(p, ["descanso diario", "repouso diario", "quanto falta para descansar", "quando posso iniciar nova jornada"])) {
+      const rest = dailyRestProgress(now);
+      if (!rest) return {ok:true,message:"Não há descanso diário entre jornadas em curso.",action:"query_rest"};
+      return rest.complete
+        ? {ok:true,message:"A meta de descanso necessária está concluída no registo local.",action:"query_rest"}
+        : {ok:true,message:`Descanso em curso: ${hm(rest.elapsed)}. Faltam ${hm(rest.left)} para a meta necessária.`,action:"query_rest"};
+    }
+    if (voiceHasAny(p, ["compensacao", "divida semanal"])) {
+      return {ok:true,message:compensationSummaryText(now),action:"query_compensation"};
+    }
+    if (voiceHasAny(p, ["pais atual", "em que pais", "qual pais"])) {
+      const c = journal.currentCountry;
+      return {ok:true,message:c ? `País atual registado: ${c.name}${c.region ? `, ${c.region}` : ""}.` : "Ainda não há país atual registado.",action:"query_country"};
+    }
+    if (voiceHasAny(p, ["estado atual", "como estou", "situacao atual", "o que estou fazendo", "o que estou a fazer", "posso conduzir", "posso dirigir"])) {
       return { ok:true, message:voiceCurrentAnswer(), action:"query" };
     }
 
-    return { ok:false, message:`Ouvi “${rawPhrase}”, mas não reconheci. Tenta “iniciar jornada”, “iniciar condução” ou “vou conduzir”.` };
+    // Descanso semanal.
+    if (voiceHasAny(p, ["descanso semanal", "repouso semanal"])) {
+      if (voiceHasAny(p, ["terminar", "finalizar", "encerrar", "fechar", "concluir"])) {
+        const record = recordCompletedWeeklyRest(now);
+        const msg = record.classification === "regular"
+          ? `Descanso semanal registado como regular: ${hm(record.seconds)}.`
+          : `Descanso semanal reduzido registado: ${hm(record.seconds)}. Compensação criada: ${hm(record.reductionSeconds)}.`;
+        renderHome(now, true);
+        return {ok:true,message:msg,action:"weekly_finish"};
+      }
+      if (voiceHasAny(p, ["cancelar", "anular"])) {
+        openTab("more");
+        $("clearWeeklyBtn")?.click();
+        return {ok:true,message:"Abri a confirmação para cancelar o descanso semanal.",action:"weekly_cancel"};
+      }
+      if (voiceHasAny(p, ["24", "vinte e quatro", "reduzido", "reduzida"])) {
+        journal.weeklyRest = { kind:"reduced", startedAt:now.toISOString(), targetSeconds:RULES.weeklyRestReduced };
+        persist(); renderHome(now, true);
+        return {ok:true,message:"Descanso semanal reduzido de 24 horas iniciado.",action:"weekly_24"};
+      }
+      if (voiceHasAny(p, ["45", "quarenta e cinco", "regular", "normal"]) || voiceActionish(p)) {
+        journal.weeklyRest = { kind:"regular", startedAt:now.toISOString(), targetSeconds:RULES.weeklyRestRegular };
+        persist(); renderHome(now, true);
+        return {ok:true,message:"Descanso semanal regular de 45 horas iniciado.",action:"weekly_45"};
+      }
+    }
+
+    // Jornada.
+    if (voiceHasAny(p, ["jornada", "turno", "servico"]) && /\b(fim|finaliza|finalizar|termina|terminar|terminei|encerra|encerrar|fechar|fechei|acabei)\b/.test(p)) {
+      if (!journal.shiftStart || journal.shiftEnd) return { ok:false, message:"Não há jornada ativa para finalizar." };
+      const when = voiceCommandTime(p, now);
+      finishShift(when, journal.currentCountry);
+      return { ok:true, message:`Jornada finalizada às ${shortTime(when)}. Cama iniciada.`, action:"finish_shift" };
+    }
+    if (voiceHasAny(p, ["jornada", "turno", "servico"]) && /\b(inicia|iniciar|inicio|iniciando|comeca|comecar|comecei|abrir|entrei)\b/.test(p)) {
+      const when = voiceCommandTime(p, now);
+      if (journal.shiftStart && !journal.shiftEnd) return {ok:true,message:"A jornada já está ativa.",action:"query"};
+      if (journal.shiftEnd && journal.dailyRest) {
+        const rest = dailyRestProgress(when);
+        if (rest && !rest.complete) {
+          return {ok:false,message:`O descanso ainda não atingiu a meta necessária. Faltam ${hm(rest.left)}.`,action:"rest_block"};
+        }
+        startNextShift(when, journal.currentCountry);
+      } else {
+        startShift(when, journal.currentCountry);
+      }
+      return {ok:true,message:`Jornada iniciada às ${shortTime(when)} em Cama/Pausa.`,action:"start_shift"};
+    }
+
+    // Ferry / comboio.
+    if (voiceHasAny(p, ["ferry", "ferri", "balsa", "comboio", "trem", "train"])) {
+      ensureShiftForVoice();
+      let type = "ferry_availability";
+      if (voiceHasAny(p, ["descanso", "repouso", "pausa", "cama", "dormir"])) type = "ferry_rest";
+      else if (voiceHasAny(p, ["trabalho", "martelo", "trabalhando"])) type = "ferry_work";
+      const changed = switchActivity(type, now);
+      const label = type === "ferry_rest" ? "repouso" : type === "ferry_work" ? "outro trabalho" : "disponibilidade";
+      return {ok:true,message:changed ? `Ferry/Comboio registado em ${label}.` : `Ferry/Comboio em ${label} já está ativo.`,action:type};
+    }
+
+    if (voiceActivityRequested(p, ["conducao","conduzir","conduzindo","dirigir","dirigindo","dirijo","rodando","ao volante"])) {
+      ensureShiftForVoice();
+      const changed = switchActivity("driving", now);
+      return { ok:true, message:changed ? "Condução registada agora." : "Já estás em condução; o cronómetro continua.", action:"driving" };
+    }
+
+    if (voiceActivityRequested(p, ["pausa","cama","descanso","repouso","descansar","parar para descansar"])) {
+      ensureShiftForVoice();
+      const changed = switchActivity("rest", now);
+      return { ok:true, message:changed ? "Cama/Pausa registada agora." : "Já estás em Cama/Pausa; o cronómetro continua.", action:"rest" };
+    }
+
+    if (voiceActivityRequested(p, ["disponibilidade","disponivel","espera","aguardando","aguardar"])) {
+      ensureShiftForVoice();
+      const changed = switchActivity("availability", now);
+      return { ok:true, message:changed ? "Disponibilidade registada agora." : "Já estás em disponibilidade; o cronómetro continua.", action:"availability" };
+    }
+
+    if (voiceActivityRequested(p, ["outro trabalho","outros trabalhos","trabalho","trabalhando","martelo","carga","descarga"])) {
+      ensureShiftForVoice();
+      const changed = switchActivity("other_work", now);
+      return { ok:true, message:changed ? "Outros trabalhos registados agora." : "Já estás em outros trabalhos; o cronómetro continua.", action:"other_work" };
+    }
+
+    // Utilidades.
+    if (voiceHasAny(p, ["fazer backup", "criar backup", "exportar backup", "guardar backup"])) {
+      exportBackup();
+      return {ok:true,message:"Backup preparado para guardar.",action:"backup"};
+    }
+    if (voiceHasAny(p, ["instalar aplicativo", "instalar aplicacao", "instalar app", "adicionar ao ecra", "adicionar a tela"])) {
+      openTab("more");
+      $("installBtn")?.click();
+      return {ok:true,message:"Abri a instalação do TachoControl.",action:"install"};
+    }
+    if (voiceHasAny(p, ["ativar som", "ligar som"])) {
+      voiceSetPreference("sound", true);
+      return {ok:true,message:"Som dos alertas ativado.",action:"sound_on"};
+    }
+    if (voiceHasAny(p, ["desativar som", "desligar som", "sem som"])) {
+      voiceSetPreference("sound", false);
+      return {ok:true,message:"Som dos alertas desativado.",action:"sound_off"};
+    }
+    if (voiceHasAny(p, ["ativar vibracao", "ligar vibracao"])) {
+      voiceSetPreference("vibration", true);
+      return {ok:true,message:"Vibração ativada.",action:"vibration_on"};
+    }
+    if (voiceHasAny(p, ["desativar vibracao", "desligar vibracao", "sem vibracao"])) {
+      voiceSetPreference("vibration", false);
+      return {ok:true,message:"Vibração desativada.",action:"vibration_off"};
+    }
+    if (voiceHasAny(p, ["resetar contadores", "reiniciar contadores", "zerar contadores"])) {
+      openTab("more");
+      $("operationalResetBtn")?.click();
+      return {ok:true,message:"Abri a confirmação para reiniciar os contadores da tela.",action:"reset_counters"};
+    }
+    if (voiceHasAny(p, ["apagar todos os dados", "apagar dados de teste", "limpar todos os dados"])) {
+      openTab("more");
+      $("resetTestBtn")?.click();
+      return {ok:true,message:"Abri a confirmação para apagar os dados locais.",action:"delete_data"};
+    }
+
+    return {
+      ok:false,
+      message:`Ouvi “${rawPhrase}”. Não encontrei uma intenção segura para executar. Podes dizer a mesma coisa de outra forma, por exemplo “agora vou dirigir”, “coloca pausa”, “estou em ferry” ou “abre o relatório”.`
+    };
   } catch (e) {
     return { ok:false, message:e.message || "Não consegui executar o comando." };
   }
@@ -3748,9 +3947,12 @@ function setupVoice() {
   }
 
   voiceRecognition = new SpeechRecognition();
-  voiceRecognition.lang = "pt-PT";
+  {
+    const deviceLang = String(navigator.language || "pt-PT");
+    voiceRecognition.lang = deviceLang.toLowerCase().startsWith("pt") ? deviceLang : "pt-PT";
+  }
   voiceRecognition.interimResults = false;
-  voiceRecognition.maxAlternatives = 1;
+  voiceRecognition.maxAlternatives = 5;
   voiceRecognition.continuous = false;
 
   voiceRecognition.onstart = () => {
@@ -3761,8 +3963,16 @@ function setupVoice() {
   };
 
   voiceRecognition.onresult = event => {
-    const phrase = event.results?.[0]?.[0]?.transcript || "";
-    handleVoiceResult(phrase);
+    const group = event.results?.[0];
+    if (!group?.length) return handleVoiceResult("");
+    let best = group[0]?.transcript || "";
+    let bestScore = voiceRecognitionScore(best) + Number(group[0]?.confidence || 0);
+    for (let i = 1; i < group.length; i++) {
+      const phrase = group[i]?.transcript || "";
+      const score = voiceRecognitionScore(phrase) + Number(group[i]?.confidence || 0);
+      if (score > bestScore) { best = phrase; bestScore = score; }
+    }
+    handleVoiceResult(best);
   };
 
   voiceRecognition.onerror = event => {

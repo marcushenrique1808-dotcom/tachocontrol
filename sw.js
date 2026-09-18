@@ -1,4 +1,4 @@
-const CACHE = "tachocontrol-v1-13-5-pwa1";
+const CACHE = "tachocontrol-v1-13-6-voice1";
 const FILES = [
   "./",
   "./index.html",
